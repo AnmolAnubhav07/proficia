@@ -29,7 +29,10 @@ export default function Hero() {
           See The Platform
         </a>
         <a className="btn btn-outline" href="#journeys">
-          Who It's For ↓
+          Who It's For
+        </a>
+        <a className="btn btn-outline" href="#faq">
+          Edge Cases
         </a>
       </div>
       <div className="hero-anim" style={delay(320)}>
