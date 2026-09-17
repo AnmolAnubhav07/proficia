@@ -1346,6 +1346,7 @@ section {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  min-width: 0;
 }
 .ai-title {
   font-family: 'Bricolage Grotesque', sans-serif;
