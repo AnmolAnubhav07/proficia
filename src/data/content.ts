@@ -220,3 +220,272 @@ export const audiences: Audience[] = [
 ]
 
 export const techStack = 'MERN · React Native · PostgreSQL/Supabase · OpenAI + LangChain · Vercel'
+
+export const standards = ['NSQF Aligned', 'EPFO/UAN Checks', 'DPDP Act 2023', 'Consent-Governed Data', 'WhatsApp + SMS']
+
+export interface AiCapability {
+  icon: Icon
+  title: string
+  description: string
+  snippet: string
+}
+
+export const aiCapabilities: AiCapability[] = [
+  {
+    icon: LayersIcon,
+    title: 'Skill Ontology Mapping',
+    description:
+      'Normalizes course and trainee skill tags against a shared taxonomy, so a "Data Analytics" course in one district can be compared with one in another.',
+    snippet: "ontology.map(course_id, standard='NSQF')",
+  },
+  {
+    icon: TrendingUpIcon,
+    title: 'Placement Demand Forecasting',
+    description:
+      'Reads recent employer hiring mandates and regional signals to flag which skills will be in demand before the next cohort graduates.',
+    snippet: 'demand_forecast(district_id, horizon_months=6)',
+  },
+  {
+    icon: ShieldIcon,
+    title: 'Verifiable Credentials',
+    description:
+      'Bridge-course completions and employer confirmations are issued as tamper-evident digital credentials, not just a row in a database.',
+    snippet: "credentials.issue(trainee_id, type='bridge_module')",
+  },
+]
+
+export interface Vocation {
+  code: string
+  title: string
+  level: string
+  readiness: number
+  gap: string
+  bridge: string
+  baselineWage: string
+  retainedWage: string
+}
+
+export const vocations: Vocation[] = [
+  {
+    code: 'NOS-IT-9821',
+    title: 'Data Analytics & Visualization',
+    level: 'NSQF Level 5',
+    readiness: 82,
+    gap: 'Advanced dashboarding (DAX / calculated fields)',
+    bridge: 'Advanced Data Modeling — 12 hrs',
+    baselineWage: '₹18,000/mo',
+    retainedWage: '₹24,500/mo',
+  },
+  {
+    code: 'NOS-EL-4410',
+    title: 'Electrical Maintenance',
+    level: 'NSQF Level 4',
+    readiness: 76,
+    gap: 'Industrial safety certification (PPE, lockout-tagout)',
+    bridge: 'Workplace Safety Bridge — 8 hrs',
+    baselineWage: '₹14,500/mo',
+    retainedWage: '₹18,200/mo',
+  },
+  {
+    code: 'NOS-WD-3310',
+    title: 'Web Development',
+    level: 'NSQF Level 5',
+    readiness: 88,
+    gap: 'Deployment & version control workflows',
+    bridge: 'Git & CI/CD Fundamentals — 6 hrs',
+    baselineWage: '₹16,000/mo',
+    retainedWage: '₹22,000/mo',
+  },
+  {
+    code: 'NOS-CN-5120',
+    title: 'CNC Machining',
+    level: 'NSQF Level 4',
+    readiness: 71,
+    gap: 'CAM software proficiency for complex toolpaths',
+    bridge: 'Applied CAM Programming — 16 hrs',
+    baselineWage: '₹15,200/mo',
+    retainedWage: '₹19,000/mo',
+  },
+]
+
+export interface BenchmarkMetric {
+  label: string
+  value: string
+  detail: string
+}
+
+export const benchmarkMetrics: BenchmarkMetric[] = [
+  { label: 'Demonstration cohort', value: '1,342', detail: 'Synthetic trainees in demo dataset' },
+  { label: '180-day retention tracked', value: '18.4%', detail: '81 verified via EPFO sandbox adapter' },
+  { label: 'Active employer mandates', value: '622', detail: 'Enterprise & MSME openings in demo DB' },
+  { label: 'Median wage growth', value: '+8.0%', detail: '₹4.47L → ₹4.60L avg across 308 placements' },
+]
+
+export interface Testimonial {
+  quote: string
+  role: string
+  scenario: string
+}
+
+export const testimonials: Testimonial[] = [
+  {
+    quote:
+      'It shifted our reporting from counting who finished a batch to tracking who actually stayed employed six and twelve months later.',
+    role: 'State Skill Mission Director (illustrative persona)',
+    scenario: 'Monitoring multi-district vocational milestones',
+  },
+  {
+    quote:
+      'We can shortlist against verified competencies instead of a resume PDF. Time-to-hire dropped noticeably.',
+    role: 'Corporate Talent Acquisition Lead (illustrative persona)',
+    scenario: 'Evaluating pre-trained candidates',
+  },
+  {
+    quote:
+      "For the first time we have longitudinal visibility into outcomes with an audit trail we can actually defend, not just a provider's word.",
+    role: 'Independent Evaluation Consultant (illustrative persona)',
+    scenario: 'Verifying 3M / 6M / 12M retention claims',
+  },
+]
+
+export interface FooterColumn {
+  title: string
+  links: string[]
+}
+
+export const footerColumns: FooterColumn[] = [
+  { title: 'Platform', links: ['Problem → Solution', 'How It Works', 'AI Foundation', 'Simulator'] },
+  { title: 'Data & Trust', links: ['Benchmark Metrics', 'Compliance', 'Edge Cases (FAQ)'] },
+  { title: 'Stakeholders', links: ['Learners', 'Training Providers', 'Employers', 'Policymakers'] },
+]
+
+export interface DemoAccount {
+  role: string
+  label: string
+  email: string
+}
+
+// Password for every seeded demo account: Demo@1234
+export const demoPassword = 'Demo@1234'
+
+export const demoAccounts: DemoAccount[] = [
+  { role: 'learner', label: 'Learner', email: 'learner@proficia.demo' },
+  { role: 'training_provider', label: 'Training Provider', email: 'provider@proficia.demo' },
+  { role: 'employer', label: 'Employer', email: 'employer@proficia.demo' },
+  { role: 'policymaker', label: 'Policymaker', email: 'policymaker@proficia.demo' },
+  { role: 'funder', label: 'Funder', email: 'funder@proficia.demo' },
+]
+
+export interface SignupRole {
+  role: string
+  label: string
+  description: string
+}
+
+export const signupRoles: SignupRole[] = [
+  { role: 'learner', label: 'Learner', description: 'Track my own training, certification & placement' },
+  { role: 'training_provider', label: 'Training Provider', description: 'Report cohort & course outcomes' },
+  { role: 'employer', label: 'Employer', description: 'Confirm placements & hire verified talent' },
+  { role: 'policymaker', label: 'Policymaker', description: 'Compare providers & districts' },
+  { role: 'funder', label: 'Funder', description: 'Track evidence of public value' },
+]
+
+export type BuildStatus = 'done' | 'partial' | 'planned'
+
+export interface BuildItem {
+  title: string
+  status: BuildStatus
+  note: string
+}
+
+// Honest status against PS 26135's "Expected Solution" checklist —
+// what's actually wired to real data vs. still a designed mockup.
+export const buildItems: BuildItem[] = [
+  {
+    title: 'Consent-based trainee accounts',
+    status: 'done',
+    note: 'Real Supabase auth + role-based signup (5 stakeholder types) with phone & email login.',
+  },
+  {
+    title: 'Role-specific profile capture',
+    status: 'done',
+    note: 'Signup collects role-specific details (qualification, org, industry, etc.) into a real profiles table.',
+  },
+  {
+    title: 'Canonical trainee ID & crosswalk',
+    status: 'planned',
+    note: 'Designed in Problem → Solution; no cross-programme ID matching built yet.',
+  },
+  {
+    title: 'Placement & employment signal capture',
+    status: 'done',
+    note: 'Learners log real placements (formal/self-employed/apprenticeship) into a live placements table.',
+  },
+  {
+    title: 'Automated & assisted follow-up (WhatsApp/SMS/calls)',
+    status: 'partial',
+    note: 'Training providers can log a real follow-up attempt per trainee; the "automated" send itself (WhatsApp/SMS API) is not wired up — logging is manual today.',
+  },
+  {
+    title: 'Employer validation (OCR, UAN/EPFO checks)',
+    status: 'partial',
+    note: 'Employers get a real one-click "Confirm Placement" action, restricted to their own company via a server-side check. OCR and UAN/EPFO API checks are not built.',
+  },
+  {
+    title: 'Self-employment & apprenticeship capture',
+    status: 'done',
+    note: 'Placement type (formal / self-employed / apprenticeship) is a real, required field on every placement record.',
+  },
+  {
+    title: 'Wage & retention progression tracking',
+    status: 'done',
+    note: 'Learners add 3/6/12/24-month retention check-ins with status and current wage — a real time series, not a snapshot.',
+  },
+  {
+    title: 'Cohort / course / provider / district analytics',
+    status: 'partial',
+    note: 'Policymaker & Funder dashboards run live aggregate queries (by course, verification rate, retention rate) over real data. District/demographic breakdowns aren’t collected yet.',
+  },
+  {
+    title: 'AI skill-gap & non-placement clustering',
+    status: 'planned',
+    note: 'Learners can log a free-text non-placement reason on a training record; automatic clustering into curriculum feedback is not built.',
+  },
+]
+
+export interface DetailField {
+  id: string
+  label: string
+  type: 'text' | 'date'
+  placeholder?: string
+}
+
+// Extra fields collected per role, in addition to name / email / phone / password.
+export const roleDetailFields: Record<string, DetailField[]> = {
+  learner: [
+    { id: 'dob', label: 'Date of Birth', type: 'date' },
+    { id: 'state', label: 'State', type: 'text', placeholder: 'e.g. Maharashtra' },
+    { id: 'district', label: 'District', type: 'text', placeholder: 'e.g. Pune' },
+    { id: 'qualification', label: 'Highest Qualification', type: 'text', placeholder: 'e.g. 12th Pass, ITI, Diploma' },
+    { id: 'interest', label: 'Area of Interest', type: 'text', placeholder: 'e.g. Data Analytics, Electrical' },
+  ],
+  training_provider: [
+    { id: 'orgName', label: 'Organization Name', type: 'text', placeholder: 'e.g. Ramesh Skilling Institute' },
+    { id: 'regId', label: 'Registration ID (NSDC / SDMS)', type: 'text', placeholder: 'e.g. NSDC-2026-1147' },
+    { id: 'state', label: 'State', type: 'text' },
+    { id: 'district', label: 'District', type: 'text' },
+  ],
+  employer: [
+    { id: 'company', label: 'Company Name', type: 'text' },
+    { id: 'industry', label: 'Industry', type: 'text', placeholder: 'e.g. Manufacturing, IT Services' },
+    { id: 'companySize', label: 'Company Size', type: 'text', placeholder: 'e.g. 11–50 employees' },
+  ],
+  policymaker: [
+    { id: 'department', label: 'Department / Mission', type: 'text', placeholder: 'e.g. State Skill Development Mission' },
+    { id: 'state', label: 'State', type: 'text' },
+  ],
+  funder: [
+    { id: 'orgName', label: 'Organization Name', type: 'text' },
+    { id: 'focusArea', label: 'Focus Area', type: 'text', placeholder: 'e.g. CSR, District Development Fund' },
+  ],
+}

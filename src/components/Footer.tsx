@@ -1,4 +1,4 @@
-import { complianceLine, techStack } from '../data/content'
+import { complianceLine, footerColumns, techStack } from '../data/content'
 
 export default function Footer() {
   return (
@@ -15,6 +15,20 @@ export default function Footer() {
           <a href="#contact">Contact</a>
         </div>
       </div>
+
+      <div className="footer-sitemap">
+        {footerColumns.map((col) => (
+          <div className="footer-col" key={col.title}>
+            <span className="footer-col-title mono">{col.title}</span>
+            <ul className="footer-col-list">
+              {col.links.map((link) => (
+                <li key={link}>{link}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
       <div className="footer-compliance mono">{complianceLine}</div>
       <div className="footer-bottom">
         <span className="mono">{techStack}</span>
