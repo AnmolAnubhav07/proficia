@@ -61,7 +61,14 @@ export default function EmployerDashboard() {
                   <span className="ws-row-title">{r.learner_name}</span>
                   <span className="ws-row-meta mono">
                     {r.role_title || 'Role not specified'} {r.wage ? `· ₹${r.wage}/mo` : ''}
+                    {r.uan_number ? ` · UAN ${r.uan_number}` : ' · no UAN on file'}
                   </span>
+                  {r.offer_letter_checked && (
+                    <span className={`ws-row-note ${r.offer_letter_match ? '' : 'ws-row-note-warn'}`}>
+                      Offer letter OCR: {r.offer_letter_match ? 'company name matched ✓' : 'no match found ⚠'}
+                    </span>
+                  )}
+                  {!r.offer_letter_checked && <span className="ws-row-note ws-row-note-warn">No offer letter uploaded for OCR check</span>}
                 </div>
                 <div className="ws-row-actions">
                   <button

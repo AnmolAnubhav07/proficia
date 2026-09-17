@@ -3,6 +3,7 @@ import {
   addCheckin,
   addPlacement,
   addTraining,
+  canonicalId,
   listMyCheckins,
   listMyFollowUps,
   listMyPlacements,
@@ -13,6 +14,7 @@ import {
   type RetentionCheckin,
   type Training,
 } from '../../lib/api'
+import { extractTextFromImage, isValidUan, textMentionsCompany } from '../../lib/ocr'
 
 const channelLabels: Record<FollowUpLog['channel'], string> = {
   whatsapp: 'WhatsApp',
@@ -31,6 +33,9 @@ export default function LearnerDashboard({ userId }: { userId: string }) {
 
   const [courseName, setCourseName] = useState('')
   const [nsqfLevel, setNsqfLevel] = useState('')
+  const [nativeId, setNativeId] = useState('')
+  const [district, setDistrict] = useState('')
+  const [state, setState] = useState('')
 
   const [placementFor, setPlacementFor] = useState<string | null>(null)
   const [placementType, setPlacementType] = useState<Placement['placement_type']>('formal')
@@ -38,6 +43,8 @@ export default function LearnerDashboard({ userId }: { userId: string }) {
   const [roleTitle, setRoleTitle] = useState('')
   const [wage, setWage] = useState('')
   const [joiningDate, setJoiningDate] = useState('')
+  const [uan, setUan] = useState('')
+  const [ocrStatus, setOcrStatus] = useState<'idle' | 'reading' | 'matched' | 'no_match' | 'error'>('idle')
 
   const [checkinFor, setCheckinFor] = useState<string | null>(null)
   const [checkinMonth, setCheckinMonth] = useState<RetentionCheckin['checkin_month']>(3)
@@ -73,12 +80,33 @@ export default function LearnerDashboard({ userId }: { userId: string }) {
     e.preventDefault()
     setError(null)
     try {
-      await addTraining({ learner_id: userId, course_name: courseName, nsqf_level: nsqfLevel })
+      await addTraining({
+        learner_id: userId,
+        course_name: courseName,
+        nsqf_level: nsqfLevel,
+        native_id: nativeId || undefined,
+        district: district || undefined,
+        state: state || undefined,
+      })
       setCourseName('')
       setNsqfLevel('')
+      setNativeId('')
+      setDistrict('')
+      setState('')
       refresh()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not add training.')
+    }
+  }
+
+  async function handleOfferLetterUpload(file: File | undefined) {
+    if (!file || !companyName) return
+    setOcrStatus('reading')
+    try {
+      const text = await extractTextFromImage(file)
+      setOcrStatus(textMentionsCompany(text, companyName) ? 'matched' : 'no_match')
+    } catch {
+      setOcrStatus('error')
     }
   }
 
@@ -95,12 +123,17 @@ export default function LearnerDashboard({ userId }: { userId: string }) {
         role_title: roleTitle,
         wage: wage ? Number(wage) : null,
         joining_date: joiningDate || null,
+        uan_number: uan || undefined,
+        offer_letter_checked: ocrStatus === 'matched' || ocrStatus === 'no_match',
+        offer_letter_match: ocrStatus === 'matched' ? true : ocrStatus === 'no_match' ? false : null,
       })
       setPlacementFor(null)
       setCompanyName('')
       setRoleTitle('')
       setWage('')
       setJoiningDate('')
+      setUan('')
+      setOcrStatus('idle')
       refresh()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not add placement.')
@@ -142,6 +175,12 @@ export default function LearnerDashboard({ userId }: { userId: string }) {
     <div className="ws-stack">
       {error && <p className="field-error">{error}</p>}
 
+      <div className="ws-id-banner">
+        <span className="ws-id-label mono">Canonical Trainee ID</span>
+        <span className="ws-id-value mono">{canonicalId(userId)}</span>
+        <span className="ws-id-hint">Stable across every programme you enrol in — use it to cross-reference this record elsewhere.</span>
+      </div>
+
       <section className="ws-section">
         <div className="ws-section-head">
           <h2>My Trainings</h2>
@@ -160,6 +199,14 @@ export default function LearnerDashboard({ userId }: { userId: string }) {
             value={nsqfLevel}
             onChange={(e) => setNsqfLevel(e.target.value)}
           />
+          <input
+            className="ws-input"
+            placeholder="Native programme ID (SDMS/PMKVY, optional)"
+            value={nativeId}
+            onChange={(e) => setNativeId(e.target.value)}
+          />
+          <input className="ws-input" placeholder="District" value={district} onChange={(e) => setDistrict(e.target.value)} />
+          <input className="ws-input" placeholder="State" value={state} onChange={(e) => setState(e.target.value)} />
           <button className="btn btn-primary" type="submit">
             Add Training
           </button>
@@ -179,6 +226,8 @@ export default function LearnerDashboard({ userId }: { userId: string }) {
                     <span className="ws-row-title">{t.course_name}</span>
                     <span className="ws-row-meta mono">
                       {t.nsqf_level || 'Level not set'} · {t.status}
+                      {t.district ? ` · ${t.district}${t.state ? `, ${t.state}` : ''}` : ''}
+                      {t.native_id ? ` · native ID ${t.native_id}` : ''}
                     </span>
                     {t.non_placement_reason && (
                       <span className="ws-row-note">Reason logged: {t.non_placement_reason}</span>
@@ -234,6 +283,36 @@ export default function LearnerDashboard({ userId }: { userId: string }) {
                         value={joiningDate}
                         onChange={(e) => setJoiningDate(e.target.value)}
                       />
+                      <input
+                        className={`ws-input ${uan && !isValidUan(uan) ? 'ws-input-invalid' : ''}`}
+                        placeholder="UAN (12-digit, optional)"
+                        value={uan}
+                        onChange={(e) => setUan(e.target.value)}
+                      />
+                      {uan && !isValidUan(uan) && <span className="ws-row-note">UAN must be exactly 12 digits.</span>}
+
+                      <div className="ws-ocr-block">
+                        <label className="ws-ocr-label mono" htmlFor={`offer-${t.id}`}>
+                          Offer letter check (OCR, runs in your browser)
+                        </label>
+                        <input
+                          id={`offer-${t.id}`}
+                          className="ws-input"
+                          type="file"
+                          accept="image/*"
+                          disabled={!companyName}
+                          onChange={(e) => handleOfferLetterUpload(e.target.files?.[0])}
+                        />
+                        {ocrStatus === 'reading' && <span className="ws-row-note">Reading document…</span>}
+                        {ocrStatus === 'matched' && (
+                          <span className="status-badge status-badge-done">Mentions "{companyName}" ✓</span>
+                        )}
+                        {ocrStatus === 'no_match' && (
+                          <span className="status-badge status-badge-planned">Company name not found in document</span>
+                        )}
+                        {ocrStatus === 'error' && <span className="ws-row-note">Could not read the image.</span>}
+                      </div>
+
                       <div className="ws-subform-actions">
                         <button className="btn btn-primary ws-btn-sm" type="submit">
                           Save Placement
@@ -271,7 +350,13 @@ export default function LearnerDashboard({ userId }: { userId: string }) {
                   </span>
                   <span className="ws-row-meta mono">
                     {p.placement_type.replace('_', ' ')} {p.wage ? `· ₹${p.wage}/mo` : ''}
+                    {p.uan_number ? ` · UAN ${p.uan_number}` : ''}
                   </span>
+                  {p.offer_letter_checked && (
+                    <span className="ws-row-note">
+                      Offer letter OCR: {p.offer_letter_match ? 'company name matched ✓' : 'no match found'}
+                    </span>
+                  )}
                 </div>
                 <div className="ws-row-actions">
                   <span className={`status-badge ${p.employer_verified ? 'status-badge-done' : 'status-badge-planned'}`}>

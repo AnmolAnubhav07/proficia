@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { getOutcomeAggregates, type OutcomeAggregates } from '../../lib/api'
+import { useEffect, useMemo, useState } from 'react'
+import { clusterNonPlacementReasons, getOutcomeAggregates, type OutcomeAggregates } from '../../lib/api'
 
 export default function AnalyticsDashboard({ role }: { role: 'policymaker' | 'funder' }) {
   const [data, setData] = useState<OutcomeAggregates | null>(null)
@@ -13,6 +13,7 @@ export default function AnalyticsDashboard({ role }: { role: 'policymaker' | 'fu
 
   const retentionRate = data && data.total_checkins > 0 ? Math.round((data.retained_checkins / data.total_checkins) * 100) : null
   const verificationRate = data && data.total_placements > 0 ? Math.round((data.verified_placements / data.total_placements) * 100) : null
+  const reasonClusters = useMemo(() => (data ? clusterNonPlacementReasons(data.non_placement_reasons) : []), [data])
 
   return (
     <div className="ws-stack">
@@ -92,6 +93,50 @@ export default function AnalyticsDashboard({ role }: { role: 'policymaker' | 'fu
                         {c.placements} of {c.trainings} placed
                       </span>
                     </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section className="ws-section">
+            <div className="ws-section-head">
+              <h2>By District</h2>
+            </div>
+            {data.by_district.length === 0 ? (
+              <p className="ws-empty">No district data yet.</p>
+            ) : (
+              <div className="ws-list">
+                {data.by_district.map((d) => (
+                  <div className="ws-row" key={d.district}>
+                    <div className="ws-row-main">
+                      <span className="ws-row-title">{d.district}</span>
+                      <span className="ws-row-meta mono">
+                        {d.placements} of {d.trainings} placed
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section className="ws-section">
+            <div className="ws-section-head">
+              <h2>Non-Placement Reasons</h2>
+            </div>
+            <p className="ws-hint">Keyword-clustered from free-text reasons logged by learners — rule-based, not a trained model.</p>
+            {reasonClusters.length === 0 ? (
+              <p className="ws-empty">No reasons logged yet.</p>
+            ) : (
+              <div className="ws-list">
+                {reasonClusters.map((c) => (
+                  <div className="ws-row" key={c.label}>
+                    <div className="ws-row-main">
+                      <span className="ws-row-title">{c.label}</span>
+                      <span className="ws-row-meta">{c.examples.join(' • ')}</span>
+                    </div>
+                    <span className="mono">{c.count}</span>
                   </div>
                 ))}
               </div>

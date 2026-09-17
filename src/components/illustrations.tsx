@@ -6,7 +6,7 @@ const MONO = "'IBM Plex Mono', monospace"
 function Panel({ children }: { children: ReactNode }) {
   return (
     <svg viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet" width="100%" height="100%">
-      <rect width="600" height="400" fill="var(--surface)" />
+      <rect width="600" height="400" fill="color-mix(in srgb, var(--surface) 100%, var(--fg) 6%)" />
       {children}
     </svg>
   )

@@ -413,8 +413,8 @@ export const buildItems: BuildItem[] = [
   },
   {
     title: 'Canonical trainee ID & crosswalk',
-    status: 'planned',
-    note: 'Designed in Problem → Solution; no cross-programme ID matching built yet.',
+    status: 'done',
+    note: 'Every learner gets a stable canonical ID derived from their account. Trainings carry an optional native programme ID (SDMS/PMKVY) alongside it — a real crosswalk field, shown on the learner dashboard.',
   },
   {
     title: 'Placement & employment signal capture',
@@ -424,12 +424,12 @@ export const buildItems: BuildItem[] = [
   {
     title: 'Automated & assisted follow-up (WhatsApp/SMS/calls)',
     status: 'partial',
-    note: 'Training providers can log a real follow-up attempt per trainee; the "automated" send itself (WhatsApp/SMS API) is not wired up — logging is manual today.',
+    note: 'Providers get real one-click WhatsApp/SMS/call links (wa.me / sms: / tel: deep links) pre-filled with the trainee’s number, plus a follow-up log. Sending is still user-initiated — no backend WhatsApp Business API push notifications yet.',
   },
   {
     title: 'Employer validation (OCR, UAN/EPFO checks)',
     status: 'partial',
-    note: 'Employers get a real one-click "Confirm Placement" action, restricted to their own company via a server-side check. OCR and UAN/EPFO API checks are not built.',
+    note: 'Real client-side OCR (Tesseract.js, runs in-browser) checks whether an uploaded offer letter mentions the employer’s name, plus UAN format validation (12-digit) and a server-verified "Confirm Placement" action. No live EPFO government API lookup — that requires official access we don’t have.',
   },
   {
     title: 'Self-employment & apprenticeship capture',
@@ -443,13 +443,13 @@ export const buildItems: BuildItem[] = [
   },
   {
     title: 'Cohort / course / provider / district analytics',
-    status: 'partial',
-    note: 'Policymaker & Funder dashboards run live aggregate queries (by course, verification rate, retention rate) over real data. District/demographic breakdowns aren’t collected yet.',
+    status: 'done',
+    note: 'Policymaker & Funder dashboards run live aggregate queries by course and by district over real data, alongside verification and retention rates.',
   },
   {
     title: 'AI skill-gap & non-placement clustering',
-    status: 'planned',
-    note: 'Learners can log a free-text non-placement reason on a training record; automatic clustering into curriculum feedback is not built.',
+    status: 'partial',
+    note: 'Non-placement reasons are logged as free text and clustered into categories (wage mismatch, location, skill gap, etc.) via transparent keyword rules — real and running on the Policymaker/Funder dashboard, but rule-based, not a trained ML model.',
   },
 ]
 

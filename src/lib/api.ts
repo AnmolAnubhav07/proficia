@@ -57,6 +57,9 @@ export interface EmployerPlacementRow {
   wage: number | null
   joining_date: string | null
   employer_verified: boolean
+  uan_number: string | null
+  offer_letter_checked: boolean
+  offer_letter_match: boolean | null
   created_at: string
 }
 
@@ -210,6 +213,12 @@ export async function addTraineeTraining(input: {
   state?: string
 }) {
   return unwrap<Training[]>(await supabase.from('trainings').insert(input).select())
+}
+
+export async function getTraineeContact(learnerId: string) {
+  const { data, error } = await supabase.rpc('get_trainee_contact', { p_learner_id: learnerId })
+  if (error) throw new Error(error.message)
+  return (data?.[0] ?? null) as { full_name: string; phone: string | null } | null
 }
 
 export async function logFollowUp(input: {

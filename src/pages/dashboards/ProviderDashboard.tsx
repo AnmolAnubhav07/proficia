@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import {
   addTraineeTraining,
   findLearnerIdByEmail,
+  getTraineeContact,
   listPlacementsForTrainings,
   listProviderTrainings,
   logFollowUp,
@@ -9,6 +10,7 @@ import {
   type Placement,
   type Training,
 } from '../../lib/api'
+import { smsLink, telLink, whatsappLink } from '../../lib/outreach'
 
 export default function ProviderDashboard({ userId }: { userId: string }) {
   const [trainings, setTrainings] = useState<Training[]>([])
@@ -20,10 +22,14 @@ export default function ProviderDashboard({ userId }: { userId: string }) {
   const [learnerEmail, setLearnerEmail] = useState('')
   const [courseName, setCourseName] = useState('')
   const [nsqfLevel, setNsqfLevel] = useState('')
+  const [nativeId, setNativeId] = useState('')
+  const [district, setDistrict] = useState('')
+  const [state, setState] = useState('')
 
   const [followUpFor, setFollowUpFor] = useState<string | null>(null)
   const [channel, setChannel] = useState<FollowUpLog['channel']>('whatsapp')
   const [note, setNote] = useState('')
+  const [contact, setContact] = useState<{ full_name: string; phone: string | null } | null>(null)
 
   async function refresh() {
     setLoading(true)
@@ -53,14 +59,35 @@ export default function ProviderDashboard({ userId }: { userId: string }) {
         setError('No learner account found with that email. They need to sign up first.')
         return
       }
-      await addTraineeTraining({ learner_id: learnerId, provider_id: userId, course_name: courseName, nsqf_level: nsqfLevel })
+      await addTraineeTraining({
+        learner_id: learnerId,
+        provider_id: userId,
+        course_name: courseName,
+        nsqf_level: nsqfLevel,
+        native_id: nativeId || undefined,
+        district: district || undefined,
+        state: state || undefined,
+      })
       setNotice(`Enrolled ${learnerEmail} in ${courseName}.`)
       setLearnerEmail('')
       setCourseName('')
       setNsqfLevel('')
+      setNativeId('')
+      setDistrict('')
+      setState('')
       refresh()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not enrol trainee.')
+    }
+  }
+
+  async function openFollowUp(learnerId: string) {
+    setFollowUpFor(learnerId)
+    setContact(null)
+    try {
+      setContact(await getTraineeContact(learnerId))
+    } catch {
+      setContact(null)
     }
   }
 
@@ -76,6 +103,9 @@ export default function ProviderDashboard({ userId }: { userId: string }) {
       setError(e instanceof Error ? e.message : 'Could not log follow-up.')
     }
   }
+
+  const defaultMessage =
+    "Hi from your training provider — checking in on your progress. Reply here or call us if you need anything."
 
   const courseOutcomes = trainings.reduce<Record<string, { total: number; placed: number }>>((acc, t) => {
     acc[t.course_name] ??= { total: 0, placed: 0 }
@@ -115,6 +145,14 @@ export default function ProviderDashboard({ userId }: { userId: string }) {
             value={nsqfLevel}
             onChange={(e) => setNsqfLevel(e.target.value)}
           />
+          <input
+            className="ws-input"
+            placeholder="Native programme ID (optional)"
+            value={nativeId}
+            onChange={(e) => setNativeId(e.target.value)}
+          />
+          <input className="ws-input" placeholder="District" value={district} onChange={(e) => setDistrict(e.target.value)} />
+          <input className="ws-input" placeholder="State" value={state} onChange={(e) => setState(e.target.value)} />
           <button className="btn btn-primary" type="submit">
             Enrol
           </button>
@@ -162,20 +200,37 @@ export default function ProviderDashboard({ userId }: { userId: string }) {
                     <span className="ws-row-title">{t.course_name}</span>
                     <span className="ws-row-meta mono">
                       {t.status} {placement ? `· placed at ${placement.company_name}` : '· not yet placed'}
+                      {t.district ? ` · ${t.district}` : ''}
                     </span>
                   </div>
                   <div className="ws-row-actions">
-                    <button
-                      className="btn btn-outline ws-btn-sm"
-                      type="button"
-                      onClick={() => setFollowUpFor(t.learner_id)}
-                    >
-                      Log Follow-up
+                    <button className="btn btn-outline ws-btn-sm" type="button" onClick={() => openFollowUp(t.learner_id)}>
+                      Follow Up
                     </button>
                   </div>
 
                   {followUpFor === t.learner_id && (
                     <form className="ws-subform" onSubmit={(e) => handleLogFollowUp(e, t.learner_id)}>
+                      {contact?.phone ? (
+                        <div className="ws-outreach-row">
+                          <a
+                            className="btn btn-outline ws-btn-sm"
+                            href={whatsappLink(contact.phone, defaultMessage)}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Open WhatsApp
+                          </a>
+                          <a className="btn btn-outline ws-btn-sm" href={smsLink(contact.phone, defaultMessage)}>
+                            Open SMS
+                          </a>
+                          <a className="btn btn-outline ws-btn-sm" href={telLink(contact.phone)}>
+                            Call
+                          </a>
+                        </div>
+                      ) : (
+                        <p className="ws-hint">No phone on file for this trainee — log a field-agent visit instead.</p>
+                      )}
                       <select className="ws-input" value={channel} onChange={(e) => setChannel(e.target.value as FollowUpLog['channel'])}>
                         <option value="whatsapp">WhatsApp</option>
                         <option value="sms">SMS</option>
